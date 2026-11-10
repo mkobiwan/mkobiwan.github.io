@@ -21,9 +21,9 @@
   #menu { overflow:auto; touch-action:pan-y; }
   body.nocursor, body.nocursor * { cursor:none !important; }
 
-  #counter { position:fixed; top:18px; left:50%; transform:translateX(-50%);
-    font-size:72px; font-weight:800; letter-spacing:2px; color:#fff;
-    text-shadow:0 0 0 #000, 3px 3px 0 #000; display:none; font-variant-numeric:tabular-nums; }
+  #word { position:fixed; top:18px; left:50%; transform:translateX(-50%); display:none; white-space:nowrap;
+    font-size:72px; font-weight:800; letter-spacing:3px; color:var(--hi); text-transform:uppercase;
+    text-shadow:3px 3px 0 #000; }
   #message { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     font-size:40px; font-weight:700; color:#bdbdbd; text-align:center; pointer-events:none;
     transition:opacity .4s; }
@@ -35,17 +35,30 @@
   .tile canvas { position:absolute; left:7%; top:7%; width:86%; height:86%; }
   .tile img.photo { position:absolute; left:5%; top:5%; width:90%; height:90%; object-fit:contain;
     border-radius:9%; filter:contrast(1.12) saturate(1.25); pointer-events:none; -webkit-user-drag:none; }
-  #lib { margin:14px 0 4px; padding:12px 14px; border:1px solid #555; border-radius:12px; background:#232323; }
-  #lib b { color:var(--hi); }
-  #libStatus { font-size:15px; color:#ddd; margin:4px 0 10px; }
-  #lib button { font-size:15px; padding:8px 12px; border-radius:8px; border:1px solid #777; background:#1e1e1e; color:#fff; cursor:pointer; margin-right:8px; }
+  #galleryBtn { margin-top:18px; width:100%; padding:12px; font-size:19px; font-weight:700; border-radius:12px;
+    background:#1e1e1e; color:#fff; border:2px solid #888; cursor:pointer; }
+  #gallery { position:fixed; inset:0; z-index:20; background:var(--bg); overflow:auto; touch-action:pan-y;
+    padding:16px 24px calc(30px + env(safe-area-inset-bottom)); display:none; }
+  #gallery .ghead { display:flex; align-items:center; gap:18px; }
+  #gallery h2 { margin:0; color:var(--hi); font-size:30px; }
+  #gallery h3 { color:#fff; font-size:22px; margin:26px 0 10px; }
+  #gallery button { font-size:16px; padding:9px 14px; border-radius:10px; border:1px solid #888; background:#1e1e1e; color:#fff; cursor:pointer; }
+  #galleryBack { font-size:18px !important; font-weight:700; background:var(--hi) !important; color:#000 !important; border:none !important; }
+  .gtools { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:14px; color:#ddd; font-size:16px; }
+  .gtools #libStatus { margin-right:8px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; }
+  .gcard { background:#000; border:2px solid #555; border-radius:12px; padding:8px; text-align:center; }
+  .gcard img { width:100%; aspect-ratio:1; object-fit:contain; display:block; border-radius:8px; background:#111; }
+  .gcard .emo { font-size:72px; line-height:1.4; font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif; }
+  .gcard .words { color:var(--hi); font-weight:700; font-size:16px; margin-top:6px; word-break:break-word; }
+  .gcard .file { color:#999; font-size:12px; margin-top:3px; word-break:break-all; }
+  .gempty { color:#bbb; font-size:16px; }
   .tile.fade { opacity:0; transform:scale(1.35) rotate(8deg); }
   .tile.gone { opacity:0; transform:scale(.4); transition:opacity .45s ease, transform .45s ease; }
   .tile.pulse { animation:pulse .7s ease-in-out infinite alternate; }
   @keyframes pulse { from { transform:scale(1); } to { transform:scale(1.12); } }
   .tile svg { position:absolute; left:-14%; top:-14%; width:128%; height:128%; pointer-events:none; overflow:visible; transition:opacity .3s; }
   .tile svg circle { fill:none; stroke:#00E5FF; stroke-linecap:round; transform:rotate(-90deg); transform-origin:50% 50%; }
-  #counter.win { color:var(--hi); }
 
   #fx { position:fixed; inset:0; pointer-events:none; }
   #dot { position:fixed; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%;
@@ -62,8 +75,8 @@
   #typed { width:220px; padding:7px 10px; border-radius:8px; border:1px solid #666; background:#2a2a2a; color:#fff; font-size:15px; }
   #bar button { padding:7px 12px; border-radius:8px; border:1px solid #666; background:#2a2a2a; color:#fff; font-size:15px; cursor:pointer; }
 
-  #menu { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:10; }
-  #menu .card { width:min(640px,92vw); background:#2b2b2b; border:3px solid var(--hi); border-radius:18px; padding:28px 32px; }
+  #menu { position:fixed; inset:0; background:var(--bg); display:flex; align-items:flex-start; justify-content:center; padding:16px; z-index:10; }
+  #menu .card { margin:auto 0; width:min(640px,92vw); background:#2b2b2b; border:3px solid var(--hi); border-radius:18px; padding:28px 32px; }
   #menu h1 { margin:0 0 6px; color:var(--hi); font-size:34px; }
   #menu p { margin:6px 0 18px; color:#ddd; line-height:1.45; font-size:17px; }
   #menu label { display:flex; justify-content:space-between; align-items:center; gap:16px; margin:10px 0; font-size:17px; }
@@ -80,10 +93,7 @@
 <div id="menu">
   <div class="card">
     <h1>Look &amp; Find</h1>
-    <p>Say two objects, like “<b>dog or cat</b>”. The first appears on the left, the second on the right, and a counter starts.
-       Look at the one you choose until the ring fills – it moves to the center and bursts into fireworks.
-       (Saying just one object shows it in the center.) The photo whose <b>file name</b> best matches your words is shown;
-       if no photo matches, a built-in picture is used.</p>
+    <p>Say two objects, like <b>DOG</b> and <b>CAT</b>. Then you can pick the object you want by touching the screen, or any other input method.</p>
     <label>Image size
       <select id="sizeMode">
         <option value="area">1/10 of the screen area</option>
@@ -93,25 +103,31 @@
     <label>Look time needed (seconds)
       <input id="dwell" type="number" min="0.3" max="5" step="0.1" value="2">
     </label>
-    <div id="lib">
-      <b>Photo library</b>
-      <div id="libStatus">Looking for photos…</div>
-      <button id="libReload" type="button">↻ Reload photos</button>
-      <button id="libPick" type="button">📁 Use photos from this device</button>
-      <input id="libFiles" type="file" accept="image/*" multiple hidden>
-    </div>
     <label>Hide the mouse cursor <input id="hideCursor" type="checkbox"></label>
     <label>Show gaze dot <input id="showDot" type="checkbox"></label>
+    <button id="galleryBtn" type="button">🖼️ Pictures &amp; words</button>
     <button id="start">Start</button>
     <div id="warn"></div>
-    <p class="small">Gaze is read from the pointer position, so your eye-tracking software must move the pointer
-       (on PC: GazeCursor; on iPad: Settings → Accessibility → Eye Tracking, or an eye tracker via AssistiveTouch).
-       A tap on an object – including an iPad dwell tap – also chooses it. If listening stops, tap 🎤.
-       Press Esc or Menu to come back here.</p>
   </div>
 </div>
 
-<div id="counter">0</div>
+<div id="gallery">
+  <div class="ghead">
+    <button id="galleryBack" type="button">← Back</button>
+    <h2>Pictures &amp; words</h2>
+  </div>
+  <div class="gtools">
+    <span id="libStatus">Looking for photos…</span>
+    <button id="libReload" type="button">↻ Reload photos</button>
+    <button id="libPick" type="button">📁 Use photos from this device</button>
+    <input id="libFiles" type="file" accept="image/*" multiple hidden>
+  </div>
+  <h3 id="gPhotosTitle">Your photos</h3>
+  <div id="gPhotos" class="grid"></div>
+  <h3 id="gBuiltTitle">Built-in pictures</h3>
+  <div id="gBuilt" class="grid"></div>
+</div>
+<div id="word"></div>
 <div id="message"></div>
 <canvas id="fx"></canvas>
 <div id="dot"></div>
@@ -120,7 +136,7 @@
   <button id="micBtn" title="Listen">🎤</button>
   <div id="mic" title="Microphone"></div>
   <div id="heard">Not listening</div>
-  <input id="typed" placeholder="…or type “dog or cat” + Enter">
+  <input id="typed" placeholder="…or type “dog and cat” + Enter">
   <button id="menuBtn">Menu</button>
 </div>
 
@@ -242,21 +258,21 @@ function bestPhoto(part, fuzzy, excludeKey){
   }
   if (!cands.length) return null;
   const p = cands[Math.floor(Math.random() * cands.length)];   // equal matches: pick one at random
-  return { kind:"photo", src:p.src, name:p.name, key:p.src };
+  return { kind:"photo", src:p.src, name:p.name, key:p.src, label:qt.join(" ") };
 }
 /** One spoken part ("the big dog") -> a photo, or an emoji if no photo matches. */
 function resolvePart(part, fuzzy, excludeKey){
   const mk = part + "|" + fuzzy + "|" + (excludeKey || "");
   if (memo.has(mk)) return memo.get(mk);                     // same words -> same photo while speaking
   let r = bestPhoto(part, fuzzy, excludeKey);
-  if (!r) { const e = findAll(part)[0]; if (e && e.emoji !== excludeKey) r = { kind:"emoji", emoji:e.emoji, name:e.name, key:e.emoji }; }
+  if (!r) { const e = findAll(part)[0]; if (e && e.emoji !== excludeKey) r = { kind:"emoji", emoji:e.emoji, name:e.name, key:e.emoji, label:e.name }; }
   memo.set(mk, r);
   return r;
 }
-/** Decide what a phrase asks for: "X or Y" = two objects, otherwise one object.
+/** Decide what a phrase asks for: "X and Y" / "X or Y" = two objects, otherwise one object.
     Unfinished speech only triggers once "or" and both objects are clearly heard. */
 function parsePhrase(text, isFinal){
-  const parts = norm(text).split(/(?:^| )or(?: |$)/).map(s => s.trim());
+  const parts = norm(text).split(/(?:^| )(?:or|and)(?: |$)/).map(s => s.trim());
   if (parts.length >= 2) {
     if (!parts[0] || !parts[1]) return null;
     const a = resolvePart(parts[0], isFinal);
@@ -394,8 +410,8 @@ function drawObject(canvas, emoji, px){
 
 /* ---------------- Game state ---------------- */
 let state = "menu";            // menu | waiting | showing | celebrating
-let tiles = [], shownAt = 0, lastT = 0, currentKey = "", celebrateTimers = [];
-const counter = $("counter"), msg = $("message");
+let tiles = [], lastT = 0, currentKey = "", celebrateTimers = [];
+const wordEl = $("word"), msg = $("message");
 const CIRC = 2*Math.PI*46;
 
 function tileSide(){ return S.sizeMode === "width" ? innerWidth/10 : Math.sqrt(innerWidth*innerHeight/10); }
@@ -445,15 +461,25 @@ function showObjects(objs){
   Promise.race([Promise.all(tiles.map(t => t.ready)), new Promise(r => setTimeout(r, 2500))]).then(() => {
     if (token !== showToken || state !== "loading") return;
     tiles.forEach(t => t.el.style.visibility = "");
-    shownAt = performance.now();
-    counter.className = ""; counter.textContent = "0"; counter.style.display = "block";
     state = "showing";
   });
 }
 function later(fn, ms){ celebrateTimers.push(setTimeout(fn, ms)); }
+/* Say a word out loud with the device's voice; calls done() when finished (or after maxMs). */
+function sayWord(text, done, maxMs){
+  let finished = false; const finish = () => { if (!finished) { finished = true; done(); } };
+  setTimeout(finish, maxMs || 2500);
+  try {
+    const synth = window.speechSynthesis; if (!synth || !text) return finish();
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US"; u.rate = 0.9; u.pitch = 1.1; u.volume = 1;
+    u.onend = () => setTimeout(finish, 150); u.onerror = finish;
+    synth.speak(u);
+  } catch(e) { finish(); }
+}
 function select(chosen){
   state = "celebrating";
-  const secs = Math.max(1, Math.round((performance.now() - shownAt)/1000));
   chosen.ring.style.strokeDashoffset = 0;
   tiles.forEach(t => { if (t !== chosen) t.el.classList.add("gone"); });
   later(() => { tiles.filter(t => t !== chosen).forEach(t => t.el.remove()); tiles = [chosen]; }, 500);
@@ -461,20 +487,24 @@ function select(chosen){
   const c = { x: innerWidth/2, y: innerHeight/2 + 20 };
   const moving = tiles.length > 1;
   later(() => { chosen.el.querySelector("svg").style.opacity = 0; setTilePos(chosen, c); }, 250);
-  const arrive = moving ? 1100 : 300;
+  const arrive = moving ? 1100 : 300, word = chosen.obj.label || "";
   later(() => {
-    chosen.el.classList.add("pulse"); funnySound();
-    launchFireworks(c.x, c.y);
-    counter.className = "win"; counter.textContent = "🎉 " + secs + " s";
+    // 1) say the chosen word ("dog")
+    wordEl.textContent = word; wordEl.style.display = word ? "block" : "none";
+    sayWord(word, () => {
+      if (state !== "celebrating") return;
+      // 2) then the funny sound + fireworks
+      chosen.el.classList.add("pulse"); funnySound();
+      launchFireworks(c.x, c.y);
+      later(() => { chosen.el.classList.remove("pulse"); chosen.el.classList.add("fade"); }, 3300);
+      later(() => { clearTiles(); currentKey = ""; wordEl.style.display = "none"; memo.clear();
+        if (state === "celebrating") { state = "waiting"; showMessage("Say two objects… “dog and cat”"); } }, 4200);
+    }, 2500);
   }, arrive);
-  later(() => { chosen.el.classList.remove("pulse"); chosen.el.classList.add("fade"); }, arrive + 3300);
-  later(() => { clearTiles(); currentKey = ""; counter.style.display = "none"; memo.clear();
-    if (state === "celebrating") { state = "waiting"; showMessage("Say two objects… “dog or cat”"); } }, arrive + 4200);
 }
 function loop(t){
   const dt = lastT ? Math.min(100, t - lastT) : 16; lastT = t;
   if (state === "showing") {
-    counter.textContent = Math.floor((t - shownAt)/1000);
     const need = S.dwell*1000;
     for (const tl of tiles) {
       const r = tl.el.getBoundingClientRect(), pad = r.width*0.12;
@@ -534,9 +564,10 @@ function stopListening(){ listening = false; clearTimeout(restartTimer);
 
 /* ---------------- UI wiring ---------------- */
 function resetBoard(){ celebrateTimers.forEach(clearTimeout); celebrateTimers = []; clearTiles(); currentKey = ""; showToken++; memo.clear();
-  counter.style.display = "none"; }
+  wordEl.style.display = "none"; try { speechSynthesis.cancel(); } catch(e){} }
 function startGame(){
   readSettings(); initAudio();
+  try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch(e){}
   document.body.classList.toggle("nocursor", S.hideCursor);
   $("dot").style.display = S.showDot ? "block" : "none";
   $("menu").style.display = "none";
@@ -545,7 +576,7 @@ function startGame(){
       const p = d.requestFullscreen ? d.requestFullscreen() : (d.webkitRequestFullscreen && d.webkitRequestFullscreen());
       if (p && p.catch) p.catch(()=>{}); } } catch(e){}
   resetBoard(); state = "waiting";
-  showMessage("Say two objects… “dog or cat”");
+  showMessage("Say two objects… “dog and cat”");
   startListening();
 }
 function openMenu(){
@@ -558,6 +589,7 @@ $("menuBtn").addEventListener("click", openMenu);
 function setLib(text){ $("libStatus").textContent = text; }
 function libDone(where){
   memo.clear();
+  if ($("gallery").style.display === "block") renderGallery();
   setLib(LIB.length ? `${LIB.length} photo${LIB.length === 1 ? "" : "s"} loaded ${where}.`
                     : `No photos found ${where} – built-in pictures will be used.`);
 }
@@ -609,6 +641,32 @@ $("libFiles").addEventListener("change", e => {
   e.target.value = "";
 });
 loadLibraryFromSite();
+
+/* ---------------- Pictures & words page ---------------- */
+function card(inner, words, file){
+  const d = document.createElement("div"); d.className = "gcard";
+  d.innerHTML = inner + '<div class="words"></div>' + (file ? '<div class="file"></div>' : "");
+  d.querySelector(".words").textContent = words;
+  if (file) d.querySelector(".file").textContent = file;
+  return d;
+}
+function renderGallery(){
+  const gp = $("gPhotos"); gp.innerHTML = "";
+  $("gPhotosTitle").textContent = `Your photos (${LIB.length})`;
+  if (!LIB.length) gp.innerHTML = '<div class="gempty">No photos yet. Put pictures in the “photos” folder of your site, or use “Use photos from this device”.</div>';
+  [...LIB].sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
+    const c = card('<img loading="lazy" alt="">', p.tokens.join(", ") || "(no words)", p.name);
+    c.querySelector("img").src = p.src; gp.appendChild(c);
+  });
+  const gb = $("gBuilt"); gb.innerHTML = "";
+  const entries = Object.entries(RAW);
+  $("gBuiltTitle").textContent = `Built-in pictures (${entries.length}) – used when no photo matches`;
+  entries.map(([emo, list]) => [emo, (list.includes("|") ? list.split("|") : list.split(" ")).join(", ")])
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .forEach(([emo, words]) => { const c = card('<div class="emo"></div>', words); c.querySelector(".emo").textContent = emo; gb.appendChild(c); });
+}
+$("galleryBtn").addEventListener("click", () => { renderGallery(); $("gallery").style.display = "block"; $("gallery").scrollTop = 0; });
+$("galleryBack").addEventListener("click", () => { $("gallery").style.display = "none"; });
 
 $("micBtn").addEventListener("click", () => { initAudio(); if (state !== "menu") startListening(false); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && state !== "menu") openMenu(); });
